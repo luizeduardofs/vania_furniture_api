@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:vania/vania.dart';
 import 'create_users_table.dart';
+import 'create_personal_access_tokens_table.dart';
 
 void main(List<String> args) async {
   await MigrationConnection().setup();
@@ -15,10 +16,12 @@ void main(List<String> args) async {
 
 class Migrate {
   registry() async {
-    await CreateUserTable().up();
-  }
+		 await CreateUserTable().up();
+		 await CreatePersonalAccessTokensTable().up();
+	}
 
   dropTables() async {
-    await CreateUserTable().down();
-  }
+		 await CreatePersonalAccessTokensTable().down();
+		 await CreateUserTable().down();
+	 }
 }
