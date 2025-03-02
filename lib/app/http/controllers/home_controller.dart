@@ -1,32 +1,45 @@
+import 'dart:io';
+
 import 'package:vania/vania.dart';
+import 'package:vania_furniture_api/app/models/products.dart';
 
 class HomeController extends Controller {
-  Future<Response> index() async {
-    return Response.json({'message': 'Hello Home'});
+  Future<Response> productList(int categoryId) async {
+    if (categoryId == -1) {
+      final productList = await Products().query().get();
+      return Response.json({"data": productList});
+    }
+
+    final specificProduct =
+        await Products().query().where('category_id', '=', categoryId).get();
+
+    return Response.json({"data": specificProduct});
   }
 
-  Future<Response> create() async {
-    return Response.json({});
+  Future<Response> detail(int id) async {
+    final productDetail = await Products().query().where('id', '=', id).first();
+
+    if (productDetail == null) {
+      return Response.json({"error": "Product not found"}, HttpStatus.notFound);
+    }
+
+    return Response.json({"data": productDetail});
   }
 
-  Future<Response> store(Request request) async {
-    return Response.json({});
-  }
+  Future<Response> search(Request request) async {
+    final search = request.query('search');
 
-  Future<Response> show(int id) async {
-    return Response.json({});
-  }
+    if (search == null || search.isEmpty) {
+      return Response.json({"data": []});
+    } else if (search == 'init') {
+      final products = await Products().query().limit(5).get();
+      return Response.json({"data": products});
+    }
 
-  Future<Response> edit(int id) async {
-    return Response.json({});
-  }
+    final searchResult =
+        await Products().query().where('title', 'like', '%$search').get();
 
-  Future<Response> update(Request request, int id) async {
-    return Response.json({});
-  }
-
-  Future<Response> destroy(int id) async {
-    return Response.json({});
+    return Response.json({"data": searchResult});
   }
 }
 

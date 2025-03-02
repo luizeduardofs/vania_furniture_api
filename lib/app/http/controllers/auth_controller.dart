@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:vania/vania.dart';
-
-import '../../models/user.dart';
+import 'package:vania_furniture_api/app/models/user.dart';
 
 class AuthController extends Controller {
   Future<Response> register(Request request) async {
@@ -50,16 +49,15 @@ class AuthController extends Controller {
       'password.required': 'Password is required',
     });
 
-    String email = request.input('email');
-    String password = request.input('password');
+    final body = request.body;
 
-    var user = await User().query().where('email', '=', email).first();
+    var user = await User().query().where('email', '=', body['email']).first();
 
     if (user == null) {
       return Response.json({"error": "User not found"}, HttpStatus.notFound);
     }
 
-    if (!Hash().verify(password, user['password'])) {
+    if (!Hash().verify(body['password'], user['password'])) {
       return Response.json({"error": "Your email or password is wrong"},
           HttpStatus.unauthorized);
     }
